@@ -1,0 +1,16 @@
+Create an educational infographic explaining this medical concept.
+
+The infographic should:
+- Break down the concept into digestible parts
+- Use visual elements to aid understanding
+- Include a clear flow or structure
+- Be suitable for medical trainees
+- Use professional, clean design
+- Be optimized for social media (square format, 1080x1080 pixels)
+- NOT include any watermarks, logos, or attribution text (we add our own)
+
+Concept: {topic}
+Details: {explanation}
+
+Target Audience: Medical residents and physicians
+Style: Educational, clear, professional medical infographic

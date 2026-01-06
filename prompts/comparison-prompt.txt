@@ -1,0 +1,17 @@
+Create a side-by-side comparison infographic for medical education.
+
+The infographic should:
+- Clearly compare two conditions/treatments/concepts
+- Use a split layout (left vs right)
+- Include key differentiating features
+- Be visually balanced
+- Use color coding to distinguish the two sides
+- Be optimized for social media (square format, 1080x1080 pixels)
+- Use a clean, professional design
+- NOT include any watermarks, logos, or attribution text (we add our own)
+
+Comparison: {topic_a} vs {topic_b}
+Key Differences: {key_points}
+
+Target Audience: Medical residents and physicians
+Style: Professional medical education comparison chart

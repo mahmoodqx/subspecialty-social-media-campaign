@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1080px;
+      height: 1080px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 35px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .header-logo-icon {
+      width: 28px;
+      height: 28px;
+    }
+
+    .header-logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+    }
+
+    .badge {
+      background: #f0fdf4;
+      border: 1.5px solid #22c55e;
+      color: #16a34a;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Category Tag */
+    .category {
+      display: inline-block;
+      background: #f3f4f6;
+      color: #6b7280;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 28px;
+    }
+
+    /* Question */
+    .question-stem {
+      font-size: 23px;
+      font-weight: 400;
+      line-height: 1.55;
+      color: #1a1a1a;
+      margin-bottom: 35px;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 22px 24px;
+    }
+
+    .option-letter {
+      font-weight: 600;
+      font-size: 18px;
+      color: #374151;
+      margin-right: 14px;
+      min-width: 28px;
+    }
+
+    .option-text {
+      font-size: 18px;
+      font-weight: 400;
+      color: #374151;
+      line-height: 1.4;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+    }
+
+    .website {
+      font-size: 16px;
+      font-weight: 500;
+      color: #9ca3af;
+    }
+
+    .engagement {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 19px;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    .engagement-icon {
+      width: 22px;
+      height: 22px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">Question of the Day</div>
+    <div class="header-logo">
+      <svg class="header-logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="2 0 22 23" width="28" height="28">
+        <circle cx="7.5" cy="3.5" r="2.5" fill="none" stroke="#000000" stroke-width="2"/>
+        <circle cx="7.5" cy="11.5" r="3.5" fill="#000000"/>
+        <circle cx="7.5" cy="19.5" r="3.5" fill="#000000"/>
+        <circle cx="16.5" cy="3.5" r="3.5" fill="#000000"/>
+        <circle cx="16.5" cy="11.5" r="2.5" fill="none" stroke="#000000" stroke-width="2"/>
+        <circle cx="16.5" cy="19.5" r="2.5" fill="none" stroke="#000000" stroke-width="2"/>
+      </svg>
+      <span class="header-logo-text">Subspecialty</span>
+    </div>
+  </div>
+
+  <div class="category">{{category}}</div>
+
+  <div class="question-stem">{{question_stem}}</div>
+
+  <div class="options">
+    <div class="option">
+      <span class="option-letter">A.</span>
+      <span class="option-text">{{option_a}}</span>
+    </div>
+    <div class="option">
+      <span class="option-letter">B.</span>
+      <span class="option-text">{{option_b}}</span>
+    </div>
+    <div class="option">
+      <span class="option-letter">C.</span>
+      <span class="option-text">{{option_c}}</span>
+    </div>
+    <div class="option">
+      <span class="option-letter">D.</span>
+      <span class="option-text">{{option_d}}</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="engagement">
+      <svg class="engagement-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+      </svg>
+      Follow for daily questions
+    </div>
+    <div class="website">subspecialty.com</div>
+  </div>
+
+</body>
+</html>

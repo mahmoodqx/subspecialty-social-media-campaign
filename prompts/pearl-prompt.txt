@@ -1,0 +1,17 @@
+Create an educational medical infographic about the following clinical concept.
+
+The infographic should:
+- Be visually clean and professional
+- Use a modern, minimal design aesthetic
+- Have clear hierarchy of information
+- Include relevant icons or simple illustrations
+- Be optimized for social media (square format, 1080x1080 pixels)
+- Use a white or light background
+- Have excellent text legibility
+- NOT include any watermarks, logos, or attribution text (we add our own)
+
+Topic: {topic}
+Key Concept: {key_concept}
+
+Target Audience: Medical residents and physicians
+Style: Clean medical education infographic

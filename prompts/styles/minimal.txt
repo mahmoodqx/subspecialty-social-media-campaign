@@ -1,0 +1,10 @@
+Style Modifier: MINIMAL
+
+Additional style requirements:
+- Maximum whitespace
+- Limited color palette (2-3 colors max)
+- Simple geometric shapes
+- Thin, clean lines
+- Sans-serif typography
+- No decorative elements
+- Focus on essential information only

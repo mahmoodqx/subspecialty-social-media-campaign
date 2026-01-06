@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1080px;
+      height: 1080px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
+      padding: 45px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .header-logo-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .header-logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+    }
+
+    .badge {
+      background: #22c55e;
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 25px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Category Tag */
+    .category-tag {
+      display: inline-block;
+      background: #f3f4f6;
+      color: #6b7280;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 18px;
+    }
+
+    /* Question */
+    .question-stem {
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+
+    .option.correct {
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+    }
+
+    .option-letter {
+      font-weight: 600;
+      font-size: 15px;
+      color: #374151;
+      margin-right: 12px;
+      min-width: 24px;
+    }
+
+    .option.correct .option-letter {
+      color: #16a34a;
+    }
+
+    .option-text {
+      font-size: 15px;
+      font-weight: 400;
+      color: #374151;
+      line-height: 1.4;
+    }
+
+    .option.correct .option-text {
+      color: #15803d;
+      font-weight: 500;
+    }
+
+    /* Meta Row */
+    .meta-row {
+      display: flex;
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      gap: 40px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .meta-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+
+    .meta-value.correct {
+      color: #16a34a;
+    }
+
+    /* Explanation */
+    .explanation {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-left: 4px solid #22c55e;
+      padding: 20px 24px;
+      border-radius: 16px;
+      margin-bottom: 14px;
+      flex-grow: 1;
+    }
+
+    .explanation-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 10px;
+    }
+
+    .explanation-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: #374151;
+      line-height: 1.6;
+    }
+
+    /* Key Concept */
+    .key-concept {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-left: 4px solid #6b7280;
+      padding: 16px 24px;
+      border-radius: 16px;
+    }
+
+    .key-concept-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .key-concept-text {
+      font-size: 13px;
+      font-weight: 400;
+      color: #374151;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+    }
+
+    .website {
+      font-size: 14px;
+      font-weight: 500;
+      color: #9ca3af;
+    }
+
+    .result {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    .result-icon {
+      width: 20px;
+      height: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">Answer Reveal</div>
+    <div class="header-logo">
+      <svg class="header-logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="2 0 22 23" width="24" height="24">
+        <circle cx="7.5" cy="3.5" r="2.5" fill="none" stroke="#000000" stroke-width="2"/>
+        <circle cx="7.5" cy="11.5" r="3.5" fill="#000000"/>
+        <circle cx="7.5" cy="19.5" r="3.5" fill="#000000"/>
+        <circle cx="16.5" cy="3.5" r="3.5" fill="#000000"/>
+        <circle cx="16.5" cy="11.5" r="2.5" fill="none" stroke="#000000" stroke-width="2"/>
+        <circle cx="16.5" cy="19.5" r="2.5" fill="none" stroke="#000000" stroke-width="2"/>
+      </svg>
+      <span class="header-logo-text">Subspecialty</span>
+    </div>
+  </div>
+
+  <div class="category-tag">Ophthalmology - Glaucoma</div>
+
+  <div class="question-stem">A 34-year-old man with recurrent HLA-B27-positive anterior uveitis presents with right eye pain and blurred vision. His current episode began 5 days ago and he has been using topical prednisolone acetate 1% every 2 hours. Examination reveals 2+ anterior chamber cells, IOP of 38 mmHg, and an open angle on gonioscopy without PAS. What is the most appropriate next step?</div>
+
+  <div class="options">
+    <div class="option correct">
+      <span class="option-letter">A.</span>
+      <span class="option-text">Add topical aqueous suppressant therapy</span>
+    </div>
+    <div class="option">
+      <span class="option-letter">B.</span>
+      <span class="option-text">Perform laser peripheral iridotomy</span>
+    </div>
+    <div class="option">
+      <span class="option-letter">C.</span>
+      <span class="option-text">Discontinue topical corticosteroid immediately</span>
+    </div>
+    <div class="option">
+      <span class="option-letter">D.</span>
+      <span class="option-text">Initiate oral acetazolamide 500 mg twice daily</span>
+    </div>
+  </div>
+
+  <div class="meta-row">
+    <div class="meta-item">
+      <span class="meta-label">Category</span>
+      <span class="meta-value">Glaucoma</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Topic</span>
+      <span class="meta-value">Inflammatory Glaucoma</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Correct Answer</span>
+      <span class="meta-value correct">A</span>
+    </div>
+  </div>
+
+  <div class="explanation">
+    <div class="explanation-title">Explanation</div>
+    <div class="explanation-text">Answer A is correct because this patient has secondary open-angle glaucoma associated with anterior uveitis, likely from a combination of trabecular meshwork obstruction by inflammatory debris and possible steroid-induced pressure elevation. With an open angle confirmed on gonioscopy and ongoing active inflammation (2+ cells), the appropriate management is to add topical aqueous suppressant therapy while continuing aggressive anti-inflammatory treatment.</div>
+  </div>
+
+  <div class="key-concept">
+    <div class="key-concept-title">Key Concept</div>
+    <div class="key-concept-text">Secondary open-angle glaucoma in anterior uveitis results from trabecular meshwork obstruction by inflammatory cells and debris. Gonioscopy is essential to distinguish open-angle from angle-closure mechanisms. Management requires balancing IOP control with continued anti-inflammatory therapy. Topical aqueous suppressants are first-line for pressure control.</div>
+  </div>
+
+  <div class="footer">
+    <div class="result">
+      <svg class="result-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+      </svg>
+      Save for later
+    </div>
+    <div class="website">subspecialty.com</div>
+  </div>
+
+</body>
+</html>
