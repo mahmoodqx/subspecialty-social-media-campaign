@@ -8,8 +8,8 @@ requests>=2.31.0
 # Image Processing
 Pillow>=10.0.0
 
-# AI Generation (Pipeline 2)
-google-generativeai>=0.3.0
+# AI - Text Summarization (GPT-4o)
+openai>=1.0.0
 
 # HTML to PNG (Pipeline 1 - local)
 playwright>=1.40.0

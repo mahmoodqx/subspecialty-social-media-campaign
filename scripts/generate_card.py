@@ -36,16 +36,17 @@ from datetime import datetime
 from playwright.async_api import async_playwright
 
 from config import get_supabase_client, load_env
-from utils import ensure_dir, sanitize_filename, get_templates_dir, get_output_dir
+from utils import ensure_dir, sanitize_filename, get_templates_dir, get_output_dir, process_card_data
 
 # Load environment variables
 load_env()
 
 # Configuration
 TEMPLATES_DIR = get_templates_dir()
-OUTPUT_DIR = get_output_dir() / "cards"
+OUTPUT_BASE_DIR = Path("/Users/mk/Documents/Subspecialty Questions-Answers")
 IMAGE_WIDTH = 1080
-IMAGE_HEIGHT = 1080
+IMAGE_HEIGHT = 1350  # 4:5 portrait ratio - optimal for Instagram, works well on Twitter/X
+DEVICE_SCALE_FACTOR = 2  # 2x resolution (outputs 2160x2700 images)
 
 
 # =============================================================================
@@ -59,6 +60,8 @@ SAMPLE_QUESTION_DATA = {
     "option_b": "Laser peripheral iridotomy",
     "option_c": "Trabeculectomy",
     "option_d": "Observation and reassurance",
+    "difficulty": "medium",
+    "difficulty_label": "●● Intermediate",
 }
 
 SAMPLE_ANSWER_DATA = {
@@ -77,6 +80,8 @@ SAMPLE_ANSWER_DATA = {
     "correct_answer": "A",
     "explanation": "Acute angle-closure glaucoma requires immediate IOP reduction with medical therapy (topical pilocarpine to constrict the pupil and oral/IV acetazolamide to reduce aqueous production) before definitive laser peripheral iridotomy.",
     "key_concept": "Initial management of acute angle closure focuses on medical IOP reduction before laser intervention. Pilocarpine constricts the pupil, pulling the iris away from the trabecular meshwork.",
+    "difficulty": "medium",
+    "difficulty_label": "●● Intermediate",
 }
 
 
@@ -85,12 +90,13 @@ SAMPLE_ANSWER_DATA = {
 # =============================================================================
 
 def fetch_question(question_id: str) -> dict:
-    """Fetch question data from Supabase."""
+    """Fetch question data from Supabase with specialty/subspecialty names."""
     supabase = get_supabase_client()
 
+    # Fetch question with related specialty and subspecialty
     response = (
         supabase.table("questions")
-        .select("*")
+        .select("*, medical_specialties(id, name, code), subspecialties(id, name, code)")
         .eq("id", question_id)
         .single()
         .execute()
@@ -99,7 +105,16 @@ def fetch_question(question_id: str) -> dict:
     if not response.data:
         raise ValueError(f"Question not found: {question_id}")
 
-    return response.data
+    question = response.data
+
+    # Extract specialty and subspecialty names
+    specialty_data = question.get("medical_specialties", {})
+    subspecialty_data = question.get("subspecialties", {})
+
+    question["specialty_name"] = specialty_data.get("name", "Medicine") if specialty_data else "Medicine"
+    question["subspecialty_name"] = subspecialty_data.get("name", "") if subspecialty_data else ""
+
+    return question
 
 
 def load_template(template_name: str) -> str:
@@ -136,19 +151,20 @@ def inject_data(template: str, data: dict) -> str:
 
 
 async def html_to_png(html: str, output_path: Path) -> Path:
-    """Convert HTML to PNG using Playwright (local, free)."""
+    """Convert HTML to PNG using Playwright (local, free) at 2x resolution."""
     ensure_dir(output_path.parent)
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page(
-            viewport={"width": IMAGE_WIDTH, "height": IMAGE_HEIGHT}
+            viewport={"width": IMAGE_WIDTH, "height": IMAGE_HEIGHT},
+            device_scale_factor=DEVICE_SCALE_FACTOR  # 2x for high-res output
         )
 
         # Load HTML content
         await page.set_content(html, wait_until="networkidle")
 
-        # Screenshot the page
+        # Screenshot the page (outputs at 2160x2160 with scale factor 2)
         await page.screenshot(path=str(output_path), type="png")
 
         await browser.close()
@@ -165,29 +181,59 @@ def html_to_png_sync(html: str, output_path: Path) -> Path:
 # DATA PREPARATION
 # =============================================================================
 
+# Difficulty labels mapping
+DIFFICULTY_LABELS = {
+    "easy": "● Basic",
+    "medium": "●● Intermediate",
+    "hard": "●●● Advanced",
+}
+
+
 def prepare_question_data(question: dict) -> dict:
     """Prepare data for question card template."""
-    specialty = question.get("specialty", "Medicine")
-    category = question.get("category", "")
+    specialty_name = question.get("specialty_name", "Medicine")
+    subspecialty_name = question.get("subspecialty_name", "")
+
+    # Format: "Specialty - Subspecialty" (e.g., "Ophthalmology - Glaucoma")
+    if subspecialty_name:
+        category = f"{specialty_name} - {subspecialty_name}"
+    else:
+        category = specialty_name
+
+    # Get difficulty
+    difficulty = question.get("difficulty", "medium")
+    difficulty_label = DIFFICULTY_LABELS.get(difficulty, "●● Intermediate")
 
     return {
-        "category": f"{specialty} - {category}" if category else specialty,
+        "category": category,
         "question_stem": question.get("question_stem", ""),
         "option_a": question.get("option_a", ""),
         "option_b": question.get("option_b", ""),
         "option_c": question.get("option_c", ""),
         "option_d": question.get("option_d", ""),
+        "difficulty": difficulty,
+        "difficulty_label": difficulty_label,
     }
 
 
 def prepare_answer_data(question: dict) -> dict:
     """Prepare data for answer card template."""
     correct = question.get("correct_answer", "A").upper()
-    specialty = question.get("specialty", "Medicine")
-    category = question.get("category", "")
+    specialty_name = question.get("specialty_name", "Medicine")
+    subspecialty_name = question.get("subspecialty_name", "")
+
+    # Format: "Specialty - Subspecialty" (e.g., "Ophthalmology - Glaucoma")
+    if subspecialty_name:
+        category = f"{specialty_name} - {subspecialty_name}"
+    else:
+        category = specialty_name
+
+    # Get difficulty
+    difficulty = question.get("difficulty", "medium")
+    difficulty_label = DIFFICULTY_LABELS.get(difficulty, "●● Intermediate")
 
     return {
-        "category": f"{specialty} - {category}" if category else specialty,
+        "category": category,
         "question_stem": question.get("question_stem", ""),
         "option_a": question.get("option_a", ""),
         "option_b": question.get("option_b", ""),
@@ -197,11 +243,13 @@ def prepare_answer_data(question: dict) -> dict:
         "class_b": "correct" if correct == "B" else "",
         "class_c": "correct" if correct == "C" else "",
         "class_d": "correct" if correct == "D" else "",
-        "meta_category": category,
-        "topic": question.get("topic", ""),
+        "meta_category": subspecialty_name or specialty_name,
+        "topic": question.get("concept_name", "") or question.get("topic", ""),
         "correct_answer": correct,
         "explanation": question.get("explanation", ""),
         "key_concept": question.get("key_concept", ""),
+        "difficulty": difficulty,
+        "difficulty_label": difficulty_label,
     }
 
 
@@ -224,13 +272,19 @@ def preview_template(template_name: str, html_path: str = None, output_name: str
         print(f"📄 Loading template: {template_name}")
         html = load_template(template_name)
 
-    # Determine which sample data to use
+    # Determine which sample data to use and card type
     if "answer" in template_name.lower():
-        data = SAMPLE_ANSWER_DATA
+        data = SAMPLE_ANSWER_DATA.copy()
+        card_type = "answer"
         print(f"📝 Using sample ANSWER data")
     else:
-        data = SAMPLE_QUESTION_DATA
+        data = SAMPLE_QUESTION_DATA.copy()
+        card_type = "question"
         print(f"📝 Using sample QUESTION data")
+
+    # Process data through smart truncation (uses LLM if text exceeds limits)
+    print(f"📏 Checking text lengths and summarizing if needed...")
+    data = process_card_data(data, card_type)
 
     # Inject sample data
     html = inject_data(html, data)
@@ -238,7 +292,7 @@ def preview_template(template_name: str, html_path: str = None, output_name: str
     # Generate image with Playwright
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = output_name or f"preview-{template_name}-{timestamp}.png"
-    output_path = OUTPUT_DIR / "previews" / filename
+    output_path = get_output_dir() / "previews" / filename
 
     print(f"🖼️  Rendering with Playwright...")
     html_to_png_sync(html, output_path)
@@ -251,53 +305,98 @@ def preview_template(template_name: str, html_path: str = None, output_name: str
 # PRODUCTION MODE (Question Bank Injection)
 # =============================================================================
 
-def generate_card(question_id: str, card_type: str, specialty_override: str = None) -> Path:
-    """Generate a single card image from Supabase question data."""
+def generate_carousel(question_id: str) -> tuple:
+    """
+    Generate both question and answer cards in a single folder.
 
-    # Fetch question
+    Output: /Users/mk/Documents/Subspecialty Questions/Answers/{topic}_{date}/
+            - question.png
+            - answer.png
+    """
+    # Fetch question with specialty/subspecialty data
     print(f"📥 Fetching question: {question_id}")
     question = fetch_question(question_id)
 
-    # Determine specialty folder
-    specialty = specialty_override or question.get("specialty", "general")
-    specialty_slug = sanitize_filename(specialty.lower())
+    # Get topic name for folder
+    subspecialty_name = question.get("subspecialty_name", "")
+    topic = question.get("topic", subspecialty_name) or "General"
+    topic_slug = sanitize_filename(topic)
 
-    # Load template and prepare data
-    if card_type == "question":
-        template = load_template("question-card")
-        data = prepare_question_data(question)
-        subfolder = "questions"
-    else:  # answer
-        template = load_template("answer-card")
-        data = prepare_answer_data(question)
-        subfolder = "answers"
-
-    # Inject data into template
-    print(f"🔧 Preparing {card_type} card...")
-    html = inject_data(template, data)
-
-    # Generate image with Playwright
+    # Create output folder: {topic}_{date}
     timestamp = datetime.now().strftime("%Y%m%d")
-    filename = f"{question_id}-{card_type}-{timestamp}.png"
-    output_path = OUTPUT_DIR / specialty_slug / subfolder / filename
+    folder_name = f"{topic_slug}_{timestamp}"
+    output_folder = OUTPUT_BASE_DIR / folder_name
+    ensure_dir(output_folder)
 
-    print(f"🖼️  Rendering with Playwright...")
-    html_to_png_sync(html, output_path)
-    print(f"✅ Saved: {output_path}")
+    print(f"📁 Output folder: {output_folder}")
 
-    return output_path
+    # Prepare data for both cards
+    question_data = prepare_question_data(question)
+    answer_data = prepare_answer_data(question)
 
+    # Process through smart truncation (GPT-4o if text exceeds limits)
+    print(f"📏 Checking text lengths and summarizing if needed...")
+    question_data = process_card_data(question_data, "question")
+    answer_data = process_card_data(answer_data, "answer")
 
-def generate_carousel(question_id: str, specialty_override: str = None) -> tuple:
-    """Generate both question and answer cards."""
-    question_path = generate_card(question_id, "question", specialty_override)
-    answer_path = generate_card(question_id, "answer", specialty_override)
+    # Load templates
+    question_template = load_template("question-card")
+    answer_template = load_template("answer-card")
 
-    print(f"\n🎠 Carousel complete!")
-    print(f"   Question: {question_path}")
-    print(f"   Answer:   {answer_path}")
+    # Generate Question Card
+    print(f"🔧 Generating question card...")
+    question_html = inject_data(question_template, question_data)
+    question_path = output_folder / "question.png"
+    html_to_png_sync(question_html, question_path)
+    print(f"✅ Saved: {question_path}")
+
+    # Generate Answer Card
+    print(f"🔧 Generating answer card...")
+    answer_html = inject_data(answer_template, answer_data)
+    answer_path = output_folder / "answer.png"
+    html_to_png_sync(answer_html, answer_path)
+    print(f"✅ Saved: {answer_path}")
+
+    # Generate caption and print to terminal for easy copy
+    caption = generate_caption(question)
+    print("")
+    print("=" * 50)
+    print("📋 COPY THIS CAPTION:")
+    print("=" * 50)
+    print(caption)
+    print("=" * 50)
 
     return question_path, answer_path
+
+
+def generate_caption(question: dict) -> str:
+    """Generate ready-to-post social media caption."""
+    subspecialty = question.get("subspecialty_name", "Medicine")
+    specialty = question.get("specialty_name", "Medicine")
+
+    # Use first word of subspecialty for cleaner title (e.g., "Retina" instead of "Retina and Vitreous")
+    subspecialty_short = subspecialty.split()[0] if subspecialty else "Medical"
+
+    # Hashtag from specialty (remove spaces)
+    hashtag = f"#{specialty.replace(' ', '')}"
+
+    return f"""📚 {subspecialty_short} Question of the Day
+
+Can you get it right?
+Swipe to see the answer! 👉
+
+Drop your answer in the comments before checking! ⬇️
+
+🔔 Follow @SubspecialtyHQ for daily board-style questions!
+🔗 subspecialty.com
+
+{hashtag}"""
+
+
+def generate_card(question_id: str, card_type: str) -> Path:
+    """Generate a single card (for backwards compatibility)."""
+    question_path, answer_path = generate_carousel(question_id)
+    return question_path if card_type == "question" else answer_path
 
 
 # =============================================================================
